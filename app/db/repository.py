@@ -63,6 +63,16 @@ class Repo:
         self.db_path = Path(db_path)
         self.conn = init_db(self.db_path)
 
+    def close(self) -> None:
+        """Close the underlying SQLite connection and release database files."""
+        self.conn.close()
+
+    def __enter__(self) -> "Repo":
+        return self
+
+    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
+        self.close()
+
     # ---------- records ----------
     def insert_record(self, rec: Record) -> Record:
         rec.created_at = rec.created_at or _now()
