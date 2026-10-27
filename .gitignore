@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local configuration/secrets
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+settings.json
+*settings*.json
+*.pem
+*.key
+
+# Runtime data, databases, images, and backups
+/data/*
+!/data/.gitkeep
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+images/
+*.zip
+*.backup
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
