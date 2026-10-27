@@ -92,16 +92,16 @@ def test_price_suggestion():
 
 
 def test_backup_roundtrip():
-    from app.db.repository import Repo
-    from app.db.schema import init_db
+    from app.db.repository import Repo, Record
     from app.services.exports import make_backup, restore_backup
     with tempfile.TemporaryDirectory() as d:
         d = Path(d)
         db = d / "v.sqlite3"
         imgs = d / "img"
         imgs.mkdir()
-        # create a tiny repo
-        Repo(db).conn  # just init
+        # Create a tiny repo, write data, and close it before backup/cleanup.
+        with Repo(db) as repo:
+            repo.insert_record(Record(id="VC-BACKUP-TEST", artist="Test Artist"))
         # add a test image
         (imgs / "a.jpg").write_bytes(b"test")
         # add a file inside a record dir
@@ -115,6 +115,8 @@ def test_backup_roundtrip():
         info = restore_backup(z, target / "v2.sqlite3", target / "img2")
         assert info["schema_version"] == 3
         assert (target / "v2.sqlite3").exists()
+        with Repo(target / "v2.sqlite3") as restored_repo:
+            assert restored_repo.get_record("VC-BACKUP-TEST")["artist"] == "Test Artist"
         assert (target / "img2" / "a.jpg").exists()
         assert (target / "img2" / "VC-000001" / "x.jpg").exists()
     print("backup: OK")
