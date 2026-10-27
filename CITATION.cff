@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use Vinyl Catalog, please cite the repository."
+title: "Vinyl Catalog"
+abstract: "A self-hosted web application for cataloguing vinyl records from photos, with optional AI and Discogs enrichment."
+version: 3.0.0
+date-released: 2026-10-27
+license: MIT
+type: software
+repository-code: "https://github.com/xiim-lt/vinyl-catalog"

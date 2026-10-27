@@ -1,0 +1,29 @@
+# Vinyl Catalog
+
+Vinyl Catalog is a self-hosted Python web application for cataloguing vinyl records from photos. Current release: 3.0.0. It targets macOS, Windows, and Raspberry Pi (Pi 4 recommended; Pi 3 is minimum but slow).
+
+## Capabilities
+
+- Gallery, search, filters, sorting, editable records.
+- Import 1–6 images per record with photo roles.
+- Optional AI enrichment via OpenAI, Anthropic, or Google Gemini.
+- Optional Discogs enrichment; auto-select threshold is score >= 60.
+- CSV, Excel, JSON, printable HTML export; ZIP backup/restore of database and images.
+
+## Technical map
+
+- `app/api/server.py`: FastAPI app and routes; `app/config.py`: local settings, default listener, port.
+- `app/db/`: SQLite schema and repository.
+- `app/services/`: import/grouping, background jobs, thumbnails, exports.
+- `app/ai/`: AI providers. `app/discogs/`: Discogs client and scoring.
+- `templates/`, `static/`: HTML/CSS/vanilla JS frontend.
+- `tests/`: pytest suite. Install dev dependencies with `python -m pip install -r requirements-dev.txt`; run `python -m pytest -q`.
+- `docs/ARCHITECTURE.md`, `ROADMAP.md`, `SECURITY.md`: additional design, planned work, and security guidance.
+
+## Important safety/privacy facts
+
+Runtime database, images, and settings belong in the per-user application-data directory, outside the repository. Credentials are stored locally in plaintext settings; never commit credentials or runtime data. The app binds to `0.0.0.0:8501` for LAN access and has no built-in authentication/TLS: use only on a trusted LAN, never expose the port directly to the public internet. AI enrichment sends selected images/metadata to the configured provider; Discogs lookups make external requests.
+
+## Project status
+
+Version 3.0.0 first public release. See `ROADMAP.md` for planned Pi 3 optimizations, systemd/LAN documentation, gallery thumbnails, v2 migration, and v4 import ideas. Treat roadmap entries as plans rather than implemented features.
