@@ -6,6 +6,8 @@ import io
 import json
 import logging
 import zipfile
+import sqlite3
+from contextlib import closing
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
@@ -109,6 +111,10 @@ def make_backup(db_path: Path, images_dir: Path, manifest_path: Optional[Path] =
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
         if db_path.exists():
+            # WAL-mode databases may have recent writes beside the main file.
+            # Checkpoint before archiving so the backup is self-contained.
+            with closing(sqlite3.connect(str(db_path))) as conn:
+                conn.execute("PRAGMA wal_checkpoint(FULL)")
             zf.write(str(db_path), "data/vinyl.sqlite3")
         if images_dir.exists():
             for p in images_dir.rglob("*"):
