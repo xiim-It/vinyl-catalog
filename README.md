@@ -32,7 +32,7 @@ Add release screenshots under [`docs/screenshots/`](docs/screenshots/). Suggeste
 
 ## Install and run
 
-Download and unzip the project, then open a terminal/Command Prompt in the `vinyl-catalog-v3` folder.
+Download and unzip the project, then open a terminal/Command Prompt in the the project folder folder.
 
 ### macOS / Linux / Raspberry Pi
 
