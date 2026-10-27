@@ -12,7 +12,7 @@ Vinyl Catalog runs on macOS, Windows, and Raspberry Pi. The app is hosted on you
 - Import image groups of 1–6 photos per record and label each photo (front, back, label A/B, inner sleeve, or other).
 - AI enrichment with OpenAI, Anthropic, or Google Gemini, with provider/model controls and confidence explanations.
 - Discogs lookup and candidate scoring; automatic selection only at score **60 or higher**, with manual selection otherwise.
-- Export records to CSV, Excel, JSON, or printable HTML.
+- Export records to CSV, JSON, or printable HTML.
 - Full database-and-images backup ZIP and restore.
 - Local SQLite storage; no account or cloud service required for core cataloguing.
 - Cross-platform Python app with no Node.js build step.
