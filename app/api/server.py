@@ -7,6 +7,7 @@ import mimetypes
 import os
 import shutil
 import time
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -40,8 +41,6 @@ STATIC = ROOT / "static"
 # ----------------------- App factory -----------------------
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Vinyl Catalog v3", version=__version__)
-
     data_dir = user_data_dir()
     db_path = data_dir / "vinyl.sqlite3"
     images_dir = data_dir / "images"
@@ -49,6 +48,15 @@ def create_app() -> FastAPI:
     settings = Settings.load()
     repo = Repo(db_path)
     jobs = JobManager(repo)
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        try:
+            yield
+        finally:
+            repo.close()
+
+    app = FastAPI(title="Vinyl Catalog v3", version=__version__, lifespan=lifespan)
 
     app.state.repo = repo
     app.state.jobs = jobs
@@ -386,13 +394,23 @@ def create_app() -> FastAPI:
 
     @app.post("/api/db/restore")
     async def db_restore(file: UploadFile = File(...)) -> JSONResponse:
+        nonlocal repo, jobs
         data = await file.read()
+        # Close SQLite before replacing the database (required on Windows).
+        repo.close()
         try:
             info = restore_backup(data, app.state.db_path, app.state.images_dir)
         except Exception as exc:
+            # Keep the running app usable if restore validation fails.
+            repo = Repo(app.state.db_path)
+            jobs = JobManager(repo)
+            app.state.repo = repo
+            app.state.jobs = jobs
             raise HTTPException(400, f"Restore failed: {exc}")
-        # re-open db with restored file
-        app.state.repo = Repo(app.state.db_path)
+        repo = Repo(app.state.db_path)
+        jobs = JobManager(repo)
+        app.state.repo = repo
+        app.state.jobs = jobs
         return JSONResponse({"ok": True, "info": info})
 
     @app.get("/api/meta")
